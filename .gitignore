@@ -1,0 +1,4 @@
+node_modules
+/build
+/*.log
+initial_survey_api_hardcoded.csv
