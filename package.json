@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "wb_data_analytics_resolver",
+  "name": "wellbeing-session-recovery",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {

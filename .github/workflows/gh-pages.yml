@@ -1,0 +1,32 @@
+name: github pages
+
+on:
+  push:
+    branches:
+      - master  # Set a branch to deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check source out
+        uses: actions/checkout@v2
+        with:
+          submodules: true  
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+
+      - name: Create Node.JS Environment
+        uses: bahmutov/npm-install@v1
+      
+      - name: Install NPM Packages via Yarn
+        run: yarn install
+
+      - name: Build Page
+        run: yarn build
+
+      - name: Deploy Page
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+          publish_branch: gh-pages

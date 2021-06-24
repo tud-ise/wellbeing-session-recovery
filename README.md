@@ -1,4 +1,4 @@
-# wb_data_analytics_resolver
+# Wellbeing Session Recovery
 
 ## CLI Commands
 *   `npm install`: Installs dependencies
