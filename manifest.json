@@ -1,6 +1,6 @@
 {
-  "name": "wb_data_analytics_resolver",
-  "short_name": "wb_data_analytics_resolver",
+  "name": "Session Recovery Tool - TU Darmstadt ISE",
+  "short_name": "Session Recovery Tool",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
