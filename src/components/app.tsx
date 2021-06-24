@@ -166,19 +166,6 @@ const App: FunctionalComponent = () => {
     scale: showResultBox ? 1 : 0.8,
   });
 
-  useEffect(
-    () =>
-      void console.debug({
-        user_information,
-        age,
-        key,
-        vault,
-        showResultBox,
-        resultBoxProps,
-      }),
-    [age, key, showResultBox, user_information, vault, resultBoxProps]
-  );
-
   return (
     <div className="min-w-screen min-h-screen bg-gradient-to-br from-blue-600 to-indigo-800 pt-5 sm:pt-10 md:pt-20">
       <header className="flex-none text-white relative z-10 flex flex-col items-start lg:pt-10 max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
@@ -284,8 +271,8 @@ const App: FunctionalComponent = () => {
       {showResultBox && (
         <AnimatedDIV
           style={{
-            scale: resultBoxProps.scale.to((v) => v),
-            visibility: resultBoxProps.visibility.to((v) => v),
+            scale: resultBoxProps.scale.to((v: any) => v),
+            visibility: resultBoxProps.visibility.to((v: any) => v),
           }}
           className="lg:pt-5 max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8"
         >
