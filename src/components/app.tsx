@@ -32,24 +32,78 @@ type StudentMonadState = {
   vault: typeof values[string] | null;
 };
 
-type StudentMonadAction = Action<"merge"> & Content<Partial<StudentMonadState>>;
+type StudentMonadAction =
+  | (Action<"age"> & Content<number | null>)
+  | (Action<"email"> & Content<string | null>);
 
 function applyStudentMonadAction(
   state: StudentMonadState,
   { action, content }: StudentMonadAction
 ): StudentMonadState {
-  console.debug(action, content, state);
+  if (action == "email" && content != null) {
+    const vault = values[sha256(content as string).toString()];
+    const bf = new Blowfish(
+      md5(content as string).toString(),
+      Blowfish.MODE.ECB,
+      Blowfish.PADDING.NULL
+    );
+
+    return {
+      ...state,
+      user_information: {
+        ...state.user_information,
+        email: content as string,
+      },
+      vault,
+      key: bf
+        .decode(
+          new Uint8Array(
+            vault.key_bf.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16))
+          )
+        )
+        .toString(),
+      age: parseInt(
+        bf
+          .decode(
+            new Uint8Array(
+              vault.age_bf.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16))
+            )
+          )
+          .toString(),
+        10
+      ),
+    };
+  } else if (action == "email") {
+    return {
+      user_information: {
+        ...state.user_information,
+        email: null,
+      },
+      vault: null,
+      age: null,
+      key: null,
+    };
+  }
+
   switch (action) {
-    case "merge":
-      return _.merge(state, content);
+    case "age":
+      return {
+        ...state,
+        user_information: {
+          ...state.user_information,
+          age: content as number,
+        },
+      };
+    default:
+      return state;
   }
 }
 
 function useStudentMonad(
   initialState: StudentMonadState
 ): [
-  StudentMonadState & { bf?: Blowfish },
-  (action: StudentMonadAction) => void
+  StudentMonadState,
+  (action: StudentMonadAction[] | StudentMonadAction) => void
 ] {
   const [{ user_information, age, key, vault }, dispatch] = useReducer<
     StudentMonadState,
@@ -62,56 +116,9 @@ function useStudentMonad(
       ),
     initialState
   );
-  const bf = useMemo(() => {
-    let bf: Blowfish | undefined;
-    if (user_information.email) {
-      const hash = md5(user_information.email);
-      bf = new Blowfish(
-        hash.toString(),
-        Blowfish.MODE.ECB,
-        Blowfish.PADDING.NULL
-      );
-    }
-
-    return bf;
-  }, [user_information.email]);
-
-  useEffect(() => {
-    let vault: typeof values[string] | null = null;
-    if (user_information.email) {
-      const hash = sha256(user_information.email);
-      console.debug("values[hash.toString()]", values[hash.toString()]);
-      vault = values[hash.toString()];
-    }
-
-    dispatch({
-      action: "merge",
-      content: { vault },
-    });
-  }, [user_information.email]);
-
-  useEffect(() => {
-    let content: Pick<StudentMonadState, "age" | "key"> = {
-      age: null,
-      key: null,
-    };
-
-    if (bf && vault) {
-      content = {
-        age: parseInt(
-          bf.decode(Buffer.from(vault.age_bf, "hex")).toString(),
-          10
-        ),
-        key: bf.decode(Buffer.from(vault.key_bf, "hex")).toString(),
-      };
-    }
-
-    dispatch({ action: "merge", content });
-  }, [bf, vault]);
 
   return [
     {
-      bf,
       user_information,
       age,
       key,
@@ -132,17 +139,15 @@ const Correct: FunctionalComponent = () => (
 );
 
 const App: FunctionalComponent = () => {
-  const [{ user_information, age, key, vault, bf }, dispatch] = useStudentMonad(
-    {
-      user_information: {
-        email: null,
-        age: null,
-      },
+  const [{ user_information, age, key, vault }, dispatch] = useStudentMonad({
+    user_information: {
+      email: null,
       age: null,
-      key: null,
-      vault: null,
-    }
-  );
+    },
+    age: null,
+    key: null,
+    vault: null,
+  });
   const showResultBox = useMemo(
     () =>
       [user_information.email, user_information.age, age, vault].indexOf(
@@ -164,7 +169,6 @@ const App: FunctionalComponent = () => {
   useEffect(
     () =>
       void console.debug({
-        bf,
         user_information,
         age,
         key,
@@ -172,7 +176,7 @@ const App: FunctionalComponent = () => {
         showResultBox,
         resultBoxProps,
       }),
-    [age, key, showResultBox, user_information, vault, resultBoxProps, bf]
+    [age, key, showResultBox, user_information, vault, resultBoxProps]
   );
 
   return (
@@ -257,15 +261,16 @@ const App: FunctionalComponent = () => {
                 type="submit"
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 onClick={() =>
-                  dispatch({
-                    action: "merge",
-                    content: {
-                      user_information: {
-                        email: formEmail,
-                        age: formAge,
-                      },
+                  dispatch([
+                    {
+                      action: "email",
+                      content: formEmail,
                     },
-                  })
+                    {
+                      action: "age",
+                      content: formAge,
+                    },
+                  ])
                 }
               >
                 <span className="absolute left-0 inset-y-0 flex items-center pl-3" />
