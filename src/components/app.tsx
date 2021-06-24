@@ -55,23 +55,29 @@ function applyStudentMonadAction(
         email: content as string,
       },
       vault,
-      key: bf
-        .decode(
-          new Uint8Array(
-            vault.key_bf.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16))
-          )
-        )
-        .toString(),
-      age: parseInt(
-        bf
-          .decode(
-            new Uint8Array(
-              vault.age_bf.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16))
+      key: vault.key_bf
+        ? bf
+            .decode(
+              new Uint8Array(
+                vault.key_bf.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16))
+              )
             )
+            .toString()
+        : null,
+      age: vault.age_bf
+        ? parseInt(
+            bf
+              .decode(
+                new Uint8Array(
+                  vault.age_bf
+                    .match(/.{1,2}/g)!
+                    .map((byte) => parseInt(byte, 16))
+                )
+              )
+              .toString(),
+            10
           )
-          .toString(),
-        10
-      ),
+        : null,
     };
   } else if (action == "email") {
     return {
@@ -132,12 +138,6 @@ const AnimatedDIV = animated.div as unknown as FunctionalComponent<
   h.JSX.HTMLAttributes<HTMLDivElement>
 >;
 
-const Correct: FunctionalComponent = () => (
-  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-    Correct
-  </span>
-);
-
 const App: FunctionalComponent = () => {
   const [{ user_information, age, key, vault }, dispatch] = useStudentMonad({
     user_information: {
@@ -169,7 +169,7 @@ const App: FunctionalComponent = () => {
   return (
     <div className="min-w-screen min-h-screen bg-gradient-to-br from-blue-600 to-indigo-800 pt-5 sm:pt-10 md:pt-20">
       <header className="flex-none text-white relative z-10 flex flex-col items-start lg:pt-10 max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        <h1 className="order-1 text-3xl sm:text-5xl sm:leading-none font-extrabold tracking-tight text-white mb-4">
+        <h1 className="order-1 text-5xl sm:text-5xl sm:leading-none font-extrabold tracking-tight text-white mb-4">
           Session Recovery Tool
         </h1>
         <p className="text-sm font-semibold tracking-wide uppercase mb-4">
@@ -177,10 +177,11 @@ const App: FunctionalComponent = () => {
         </p>
         <p className="order-2 leading-relaxed mb-8">
           This tool can be used to retrieve the session token using the e-mail
-          address of the participants. If you correctly entered the Rescuetime
+          address of the participants. If you correctly entered the RescueTime
           API Key, it will also be shown. For those that did not enter the API
-          Key correctly yet wish to add it so that their data can be correlated
-          correctly, please send a mail to XY.
+          Key correctly yet wish to add it, so that their data can be correlated
+          correctly, please send a mail to Gregor. If you have any questions,
+          feel free to mail / ask us or post a question in the forum.
         </p>
       </header>
 
@@ -189,6 +190,11 @@ const App: FunctionalComponent = () => {
           <div className="">
             <h2 className="flex flex-row items-center text-xl leading-6 font-medium text-gray-900">
               Provide Credentials
+              {showResultBox && (
+                <span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  Correct
+                </span>
+              )}
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-gray-500">
               We don't want to expose all data to all our students for privacy
@@ -278,7 +284,7 @@ const App: FunctionalComponent = () => {
         >
           <div className="bg-white rounded-lg shadow-lg">
             <div className=" px-4 py-6 sm:px-6 lg:px-8">
-              <h3 className="flex flex-row items-center text-lg leading-6 font-medium text-gray-900">
+              <h3 className="flex flex-col sm:flex-row items-start sm:items-center text-lg leading-6 font-medium text-gray-900">
                 Student Information for
                 <span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-200 text-gray-800">
                   {user_information.email}
@@ -292,16 +298,28 @@ const App: FunctionalComponent = () => {
               <dl>
                 <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                   <dt className="text-sm font-medium text-gray-500">Session</dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 break-all">
                     {vault?.session}
                   </dd>
                 </div>
                 <div className="bg-white rounded-lg px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                   <dt className="text-sm font-medium text-gray-500">
                     RescueTime API Key
+                    {!key && (
+                      <span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                        Not Found
+                      </span>
+                    )}
                   </dt>
-                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {key}
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 break-all">
+                    {key ? (
+                      key
+                    ) : (
+                      <span className="leading-relaxed break-normal">
+                        Feel free to send a mail to Gregor if you want your API
+                        Key to be included in the study
+                      </span>
+                    )}
                   </dd>
                 </div>
               </dl>
@@ -309,6 +327,13 @@ const App: FunctionalComponent = () => {
           </div>
         </AnimatedDIV>
       )}
+
+      <footer className="flex-none text-white relative mt-16 flex flex-col items-start lg:pt-10 max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        <p className="text-sm self-center font-semibold tracking-wide uppercase mb-4">
+          Made with ❤️ by <a href="https://github.com/jakoblorz">Jakob</a> and{" "}
+          <a href="https://github.com/gregoralbrecht">Gregor</a>
+        </p>
+      </footer>
     </div>
   );
 };
