@@ -3,10 +3,13 @@ const colors = require("tailwindcss/colors");
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
-  purge: {
-    enabled: true,
-    content: ["./src/**/*.{js,jsx,ts,tsx}", "./src/template.html"],
-  },
+  purge:
+    process.env.npm_lifecycle_script == "preact build"
+      ? {
+          enabled: true,
+          content: ["./src/**/*.{js,jsx,ts,tsx}", "./src/template.html"],
+        }
+      : ["./src/**/*.{js,jsx,ts,tsx}", "./src/template.html"],
   darkMode: false, // or 'media' or 'class'
   theme: {
     colors,
