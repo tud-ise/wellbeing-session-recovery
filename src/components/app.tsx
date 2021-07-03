@@ -3,7 +3,13 @@ import * as _ from "lodash";
 import "tailwindcss/tailwind.css";
 
 import { FunctionalComponent, h } from "preact";
-import { useEffect, useMemo, useReducer, useState } from "preact/hooks";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from "preact/hooks";
 import { animated, useSpring } from "@react-spring/web";
 
 import sha256 from "crypto-js/sha256";
@@ -166,11 +172,19 @@ const App: FunctionalComponent = () => {
     scale: showResultBox ? 1 : 0.8,
   });
 
+  const [resultData, setResultData] = useState<{ [x: string]: string }>({});
+  const loadResultData = useCallback(
+    async () =>
+      setResultData(await (await fetch("/assets/all_data_1.json")).json()),
+    []
+  );
+  useEffect(() => void loadResultData(), [loadResultData]);
+
   return (
     <div className="min-w-screen min-h-screen bg-gradient-to-br from-blue-600 to-indigo-800 pt-5 sm:pt-10 md:pt-20">
       <header className="flex-none text-white relative z-10 flex flex-col items-start lg:pt-10 max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <h1 className="order-1 text-5xl sm:text-5xl sm:leading-none font-extrabold tracking-tight text-white mb-4">
-          Session Recovery Tool
+          Personal Data Recovery Tool
         </h1>
         <p className="text-sm font-semibold tracking-wide uppercase mb-4">
           Wellbeing with Data Analytics
@@ -324,6 +338,174 @@ const App: FunctionalComponent = () => {
                 </div>
               </dl>
             </div>
+          </div>
+        </AnimatedDIV>
+      )}
+
+      {Object.keys(resultData).length > 0 && (
+        <AnimatedDIV
+          style={{}}
+          className="lg:pt-5 max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8"
+        >
+          <div className="bg-white rounded-lg shadow-lg overflow-x-auto">
+            <table className="min-w-full leading-normal">
+              <thead>
+                <tr>
+                  {Object.keys(resultData[Object.keys(resultData)[0]][0]).map(
+                    (k) => (
+                      <th
+                        key={k}
+                        className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                      >
+                        {k}
+                      </th>
+                    )
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 w-10 h-10">
+                        <img
+                          className="w-full h-full rounded-full"
+                          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.2&w=160&h=160&q=80"
+                          alt=""
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-gray-900 whitespace-no-wrap">
+                          Vera Carpenter
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">Admin</p>
+                  </td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">
+                      Jan 21, 2020
+                    </p>
+                  </td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                      <span
+                        aria-hidden
+                        className="absolute inset-0 bg-green-200 opacity-50 rounded-full"
+                      />
+                      <span className="relative">Activo</span>
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 w-10 h-10">
+                        <img
+                          className="w-full h-full rounded-full"
+                          src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.2&w=160&h=160&q=80"
+                          alt=""
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-gray-900 whitespace-no-wrap">
+                          Blake Bowman
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">Editor</p>
+                  </td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">
+                      Jan 01, 2020
+                    </p>
+                  </td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                      <span
+                        aria-hidden
+                        className="absolute inset-0 bg-green-200 opacity-50 rounded-full"
+                      />
+                      <span className="relative">Activo</span>
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 w-10 h-10">
+                        <img
+                          className="w-full h-full rounded-full"
+                          src="https://images.unsplash.com/photo-1540845511934-7721dd7adec3?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.2&w=160&h=160&q=80"
+                          alt=""
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-gray-900 whitespace-no-wrap">
+                          Dana Moore
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">Editor</p>
+                  </td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">
+                      Jan 10, 2020
+                    </p>
+                  </td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    <span className="relative inline-block px-3 py-1 font-semibold text-orange-900 leading-tight">
+                      <span
+                        aria-hidden
+                        className="absolute inset-0 bg-orange-200 opacity-50 rounded-full"
+                      />
+                      <span className="relative">Suspended</span>
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-5 py-5 bg-white text-sm">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 w-10 h-10">
+                        <img
+                          className="w-full h-full rounded-full"
+                          src="https://images.unsplash.com/photo-1522609925277-66fea332c575?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.2&h=160&w=160&q=80"
+                          alt=""
+                        />
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-gray-900 whitespace-no-wrap">
+                          Alonzo Cox
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-5 bg-white text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">Admin</p>
+                  </td>
+                  <td className="px-5 py-5 bg-white text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">
+                      Jan 18, 2020
+                    </p>
+                  </td>
+                  <td className="px-5 py-5 bg-white text-sm">
+                    <span className="relative inline-block px-3 py-1 font-semibold text-red-900 leading-tight">
+                      <span
+                        aria-hidden
+                        className="absolute inset-0 bg-red-200 opacity-50 rounded-full"
+                      />
+                      <span className="relative">Inactive</span>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </AnimatedDIV>
       )}
