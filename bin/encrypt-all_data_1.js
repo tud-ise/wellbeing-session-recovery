@@ -1,38 +1,28 @@
 /* eslint-disable */
 
 const csv = require("csvtojson");
-
-const buildSessionTokenArray = async () =>
-  (await csv().fromFile("./initial_survey_api_hardcoded.csv")).map(
-    (l) => l.session
-  );
+const Blowfish = require("egoroof-blowfish");
+const md5 = require("crypto-js/md5");
+const fs = require("fs");
 
 (async () => {
-  const sessionTokens = await buildSessionTokenArray();
-  console.log(
-    JSON.stringify(
-      // (await csv().fromFile("./all_data_1.csv")).reduce(
-      //   (acc, { id, ...rest }) => ({
-      //     [sessionTokens[parseInt(id, 10) % sessionTokens.length]]: [
-      //       acc[sessionTokens[parseInt(id, 10) % sessionTokens.length]],
-      //       rest,
-      //     ].filter((e) => e != null),
-      //     ...acc,
-      //   }),
-      //   {}
-      // )
-      (await csv().fromFile("./all_data_1.csv"))
-        .map(({ id, ...rest }) => ({
-          ...rest,
-          id: sessionTokens[parseInt(id, 10) % sessionTokens.length],
-        }))
-        .reduce(
-          (acc, { id, ...rest }) => ({
-            ...acc,
-            [id]: acc.id ? [...acc.id, rest] : [rest],
-          }),
-          {}
-        )
-    )
-  );
+  const students = await csv().fromFile("./initial_survey_api_hardcoded.csv");
+
+  const data = fs.readFileSync("./all_data_1.csv").toString();
+  for (let i = 0; i < students.length; i++) {
+    if (!students[i].participant_email) {
+      continue;
+    }
+
+    fs.writeFileSync(
+      `./${students[i].session}.csv`,
+      Buffer.from(
+        new Blowfish(
+          md5(students[i].participant_email).toString(),
+          Blowfish.MODE.ECB,
+          Blowfish.PADDING.NULL
+        ).encode(data)
+      ).toString("hex")
+    );
+  }
 })();
