@@ -117,20 +117,12 @@ const App: FunctionalComponent = () => {
           className="lg:pt-5 max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8"
         >
           <DataExplorer
+            csv={csvDecoded}
             session={session}
             data={data}
             columns={columns}
             controls={controls}
           />
-
-          <div className="flex flex-row-reverse px-4 py-4 sm:px-6 lg:px-8 text-sm">
-            <a
-              href={`data:text/csv;charset=utf-8,${""}`}
-              download={`${email}.csv`}
-            >
-              Download file (.csv)
-            </a>
-          </div>
         </AnimatedDIV>
       )}
 

@@ -9,7 +9,7 @@ export const WindowControls: FunctionalComponent<
   ReturnType<typeof useWindow>[2]
 > = ({ backward, forward, offset, size, values: rows }) => {
   return (
-    <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+    <div className="bg-white px-4 py-3 pt-4 flex items-center justify-between border-t border-gray-200 sm:px-6">
       <div className="flex-1 flex justify-between sm:hidden">
         <button
           onClick={(e) => void (e.preventDefault, backward())}
