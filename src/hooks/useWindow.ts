@@ -10,7 +10,7 @@ export default function useWindow<T>(values: Array<T>, initalPaginationProps = {
     useMemo(() => values.filter((v, i) => i > offset && i < offset + size), [size, offset, values]),
     useMemo(() => Object.keys(values.reduce((acc, val) => ({
       ...acc,
-      ...Object.keys(val).reduce((acc, k) => ({...acc, [k]: true }), { id: true } as IndexSignature<boolean>),
+      ...Object.keys(val).reduce((acc, k) => ({...acc, [k]: true }), { } as IndexSignature<boolean>),
     }), {} as IndexSignature<boolean>)), [values]),
     {
       size,
