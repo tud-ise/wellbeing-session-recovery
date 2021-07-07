@@ -33,7 +33,10 @@ export default function useTranslation() {
 export const TranslationProvider: FunctionComponent = ({ children }) => {
   const [locale, setLocale] = useState(getInitialLocale());
   useEffect(() => {
-    if (locale !== localStorage.getItem("locale")) {
+    if (
+      typeof window !== "undefined" &&
+      locale !== localStorage.getItem("locale")
+    ) {
       localStorage.setItem("locale", locale);
     }
   }, [locale]);
