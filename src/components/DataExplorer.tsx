@@ -11,7 +11,7 @@ export default function DataExplorer<T>({
   columns,
   controls,
 }: {
-  csv: string;
+  csv: Possible<string>;
   session: Possible<string>;
   data: Array<IndexSignature<unknown>>;
   columns: Array<string>;
