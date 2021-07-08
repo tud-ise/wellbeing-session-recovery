@@ -44,7 +44,7 @@ const App: FunctionalComponent = () => {
   const ageDecoded = parseInt(useMD5BlowfishDecoder(age_bf, email) || "", 10);
   const csvDecoded = useMD5BlowfishDecoder(
     useRemoteText<Possible<string>>(
-      session ? `/assets/${session}.csv` : null,
+      session ? `/wellbeing-session-recovery/assets/${session}.csv` : null,
       null,
       [session]
     ),
